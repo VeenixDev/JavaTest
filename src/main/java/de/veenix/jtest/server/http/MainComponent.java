@@ -10,6 +10,7 @@ public class MainComponent {
     public MainComponent() {
         HtmlElement element = new HtmlElement();
         element.setValue("Test Test");
+        element.addAttribute("class", "text");
         element.setElementName("span");
         elements.add(element);
     }

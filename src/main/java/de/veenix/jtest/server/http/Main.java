@@ -25,9 +25,13 @@ public class Main {
                 }
             }
 
-            String html = "<html><header><title>HTTP SERVER RESPONSE</title></header><body>{{body}}</body></html>";
+            String html = "<html><header><title>HTTP SERVER RESPONSE</title><style>{{css}}</style></header><body>{{body}}</body></html>";
+
+            StyleComponent style = new StyleComponent();
+            style.addRule(".text", "background-color", "red");
 
             html = html.replace("{{body}}", new MainComponent().toString());
+            html = html.replace("{{css}}", style.toString());
 
             writer.write("HTTP/1.1 200 OK\r\n");
             writer.write("Server: VHTTP/0.1\r\n");

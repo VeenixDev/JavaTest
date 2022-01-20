@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HtmlElement {
 
@@ -74,6 +75,12 @@ public class HtmlElement {
             sb.append(element.toString());
         }
 
-        return "<" + elementName + ">" + value + sb + "</" + elementName + ">";
+        AtomicReference<String> attributesStr = new AtomicReference<>("");
+        attributes.forEach((k, v) -> attributesStr.set(attributesStr.get() + " " + k + "=\"" + v + "\""));
+
+        AtomicReference<String> togglesStr = new AtomicReference<>("");
+        toggles.forEach(v -> togglesStr.set(togglesStr.get() + " " + v));
+
+        return "<" + elementName + attributesStr.get() + " " + togglesStr.get() + ">" + value + sb + "</" + elementName + ">";
     }
 }
