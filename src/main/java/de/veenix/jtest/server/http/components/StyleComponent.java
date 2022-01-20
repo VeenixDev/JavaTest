@@ -1,13 +1,10 @@
-package de.veenix.jtest.server.http;
+package de.veenix.jtest.server.http.components;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StyleComponent {
 
-    private final Map<String, List<String>> rules = new HashMap<>();
+    private final LinkedHashMap<String, List<String>> rules = new LinkedHashMap<>();
 
     public void addRule(String selector, String ruleName, String ruleValue) {
         if(rules.containsKey(selector)) {
@@ -32,7 +29,7 @@ public class StyleComponent {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         rules.forEach((k,v) -> {
-            sb.append(k).append(": {");
+            sb.append(k).append(" {");
             v.forEach(e -> sb.append(e).append(";"));
             sb.append("}");
         });

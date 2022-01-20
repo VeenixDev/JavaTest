@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class HtmlElement {
 
-    private String elementName;
-    private String value;
+    private String elementName = "div";
+    private String value = "";
     private final Map<String, String> attributes = new HashMap<>();
     private final List<String> toggles = new ArrayList<>();
     private final List<HtmlElement> children = new ArrayList<>();
