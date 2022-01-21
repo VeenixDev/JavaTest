@@ -1,7 +1,7 @@
 package de.veenix.jtest.server.http.components;
 
 import de.veenix.jtest.server.http.HtmlElement;
-import de.veenix.jtest.server.http.anntotations.Component;
+import de.veenix.jtest.server.http.interfaces.Component;
 
 import java.util.ArrayList;
 import java.util.List;
