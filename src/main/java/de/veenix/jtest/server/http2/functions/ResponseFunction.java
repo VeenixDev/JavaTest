@@ -16,6 +16,7 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
         if(httpRequest.getHeader() != null) {
             copyKey("cookies", headers, httpRequest.getHeader());
         }
+        headers.put("Content-Type" ,"text/html, text, plain");
 
         if(httpRequest.getType() == HTTPType.GET && httpRequest.getRequestPath().equals("/stopServer")) {
             // Killswitch for the server

@@ -21,11 +21,10 @@ public class HTTPResponse {
         stream.write("HTTP/1.1\r\n".getBytes());
 
         for(Map.Entry<String, String> headerValue : header.entrySet()) {
-            stream.write((headerValue.getKey() + ": " + headerValue.getValue()).getBytes());
+            stream.write((headerValue.getKey() + ": " + headerValue.getValue() + "\r\n").getBytes());
         }
 
         stream.write("Server: VHTTP/0.1\r\n".getBytes());
-        stream.write("Content-Type: text/html, text, plain\r\n".getBytes());
         stream.write(("Content-Length: " + (response.getBody().length() - 1) + "\r\n").getBytes());
         stream.write("\r\n".getBytes());
         stream.write(response.getBody().getBytes());
