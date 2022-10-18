@@ -31,4 +31,14 @@ public class HTTPRequest {
     public HashMap<String, String> getHeader() {
         return header;
     }
+
+    @Override
+    public String toString() {
+        return "HTTPRequest{" +
+                "type=" + type +
+                ", version='" + version + '\'' +
+                ", requestPath='" + requestPath + '\'' +
+                ", header=" + header +
+                '}';
+    }
 }

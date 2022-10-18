@@ -9,7 +9,6 @@ public class FunctionResponse<R> {
         this.error = error;
         this.response = response;
     }
-
     public boolean isError() {
         return error;
     }

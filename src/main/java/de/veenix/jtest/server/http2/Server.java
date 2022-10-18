@@ -1,30 +1,28 @@
 package de.veenix.jtest.server.http2;
 
-import org.apache.log4j.Logger;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Optional;
 
+@Log4j2
 public class Server {
-
-    private static final Logger logger = Logger.getLogger(Server.class);
-
     private final int port;
     private final ServerSocket serverSocket;
 
     public Server(int port) throws IOException {
         this.port = port;
         serverSocket = new ServerSocket(port);
-        logger.info("Started Server on port " + port);
+        log.info("Started Server on port " + port);
     }
 
     public Optional<Socket> accept() {
         try {
             return Optional.of(serverSocket.accept());
         } catch (IOException exception) {
-            logger.error(exception.getMessage());
+            log.error(exception.getMessage());
             return Optional.empty();
         }
     }
@@ -33,12 +31,12 @@ public class Server {
         try {
             if (!serverSocket.isClosed()) {
                 serverSocket.close();
-                logger.info("Server closed");
+                log.info("Server closed");
             } else {
-                logger.warn("Server is already closed!");
+                log.warn("Server is already closed!");
             }
         } catch (IOException exception) {
-            logger.error(exception.getMessage());
+            log.error(exception.getMessage());
         }
     }
 

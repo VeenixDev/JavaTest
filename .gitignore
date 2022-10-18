@@ -26,3 +26,5 @@ out/
 src/META-INF
 *.iml
 /.idea/
+.attach_pid*
+src/main/resources/META-INF
