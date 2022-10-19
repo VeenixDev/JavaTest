@@ -3,7 +3,9 @@ package de.veenix.jtest.server.http2.functions;
 import de.veenix.jtest.server.http2.*;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.FileDescriptor;
 import java.io.FileReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -21,7 +23,8 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
             copyKey("session", headers, httpRequest.getHeader(), () -> UUID.randomUUID().toString());
         }
         String[] requestedFileNameSplit = httpRequest.getRequestPath().split("/", Integer.MAX_VALUE);
-        headers.put("Content-Type" , Utils.getMimeType(requestedFileNameSplit[requestedFileNameSplit.length - 1]));
+        FileInfo fileInfo = Utils.getFileInfo(requestedFileNameSplit[requestedFileNameSplit.length - 1]);
+        headers.put("Content-Type" , fileInfo.getMimeType());
 
         if(httpRequest.getType() == HTTPType.GET && httpRequest.getRequestPath().equals("/stopServer")) {
             // Killswitch for the server
@@ -30,10 +33,19 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
             return new FunctionResponse<>(false, new HTTPResponse(HTTPStatus.OK, "<html><head><title>Test</title></head><body>Server Stopped!</body></html>", headers));
         }
 
-        String content = Utils.readFile(httpRequest.getRequestPath());
+        byte[] content = Utils.readFile(httpRequest.getRequestPath(), fileInfo.isBinary());
         if(content != null) {
-            return new FunctionResponse<>(false, new HTTPResponse(HTTPStatus.OK, Utils.readFile(httpRequest.getRequestPath()), headers));
+            if(httpRequest.getRequestPath().equals("/assets/logo.svg")) {
+                StringBuilder sb = new StringBuilder();
+                for(byte b : content) {
+                    sb.append((char) b);
+                }
+                log.info(sb.toString());
+            }
+
+            return new FunctionResponse<>(false, new HTTPResponse(HTTPStatus.OK, Utils.readFile(httpRequest.getRequestPath(), fileInfo.isBinary()), headers));
         } else {
+            log.warn("Couldn't find requested file");
             return new FunctionResponse<>(true, new HTTPResponse(HTTPStatus.NOT_FOUND, "<html><head><title>404 - Not found</title></head><body>404 - Not found</body></html>", headers));
         }
     }

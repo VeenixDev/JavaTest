@@ -6,33 +6,52 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Log4j2
 public class Utils {
 
-    private static final String BASE_PATH = "/home/paul/workspace/plainWeb";
+    private static final String BASE_PATH = "D:\\Workspace\\Private\\Web\\veenixdev.github.io";
 
-    public static String readFile(String relativePath) {
+    public static byte[] readFile(String relativePath, boolean isBinary) {
         if(relativePath.contains("..")) {
             log.warn("Blocked file read because it used '..' which is not allowed");
             return null;
         }
-        StringBuilder fileContentBuilder = new StringBuilder();
-        File file = new File(BASE_PATH + (relativePath.startsWith("/") ? "" : "/") + relativePath);
+
+        if(relativePath.startsWith("./")) {
+            relativePath = relativePath.substring(2);
+        }
+
+        String path = BASE_PATH + (relativePath.startsWith("/") ? "" : "/") + relativePath;
+        File file = new File(path);
 
         if(!file.exists()) {
+            log.warn("File doesn't exit at path: " + file.getPath());
             return null;
         }
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while((line = reader.readLine()) != null) {
-                fileContentBuilder.append(line).append("\n");
-            }
+            if(isBinary) {
+                return Files.readAllBytes(Path.of(path));
+            } else {
+                FileReader fReader = new FileReader(file);
+                BufferedReader reader = new BufferedReader(fReader);
 
-            reader.close();
-            return fileContentBuilder.toString();
+                StringBuilder contentBuilder = new StringBuilder();
+                String line;
+
+                while((line = reader.readLine()) != null) {
+                    contentBuilder.append(line).append("\n");
+                }
+
+                reader.close();
+                return contentBuilder.toString().getBytes();
+            }
         } catch (IOException exception) {
             log.error("Failed while reading the file: " + exception.getMessage());
             return null;
@@ -46,7 +65,28 @@ public class Utils {
             case "ico" -> "image/x-icon";
             case "html", "htm" -> "text/html";
             case "js" -> "text/javascript";
+            case "svg" -> "image/svg+xml";
             default -> "text/plain";
         };
+    }
+
+    private static final String[] binaryExtensions = {"ico", "bin", "exe", "jar"};
+
+    public static boolean isFileBinary(String fileName) {
+        String[] extensionSplit = fileName.split("\\.", Integer.MAX_VALUE);
+        return Arrays.stream(binaryExtensions).anyMatch(ext -> ext.equals(extensionSplit[extensionSplit.length - 1]));
+    }
+
+    public static FileInfo getFileInfo(String fileName) {
+        String mimeType = getMimeType(fileName);
+        boolean isBinary = isFileBinary(fileName);
+        String[] extensionSplit = fileName.split("\\.", Integer.MAX_VALUE);
+        String fileExtension = extensionSplit[extensionSplit.length - 1];
+
+        return new FileInfo(mimeType, isBinary, fileName, fileExtension);
+    }
+
+    public static boolean checkMethod(HTTPRequest request, HTTPType type) {
+        return false;
     }
 }

@@ -5,35 +5,51 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The class represents a response from the web server
+ */
 public class HTTPResponse {
 
     private final HTTPStatus status;
     private final String body;
+    private final byte[] binData;
     private final HashMap<String, String> header;
 
     public HTTPResponse(HTTPStatus status, String body, HashMap<String, String> header) {
         this.status = status;
         this.body = body;
         this.header = header;
+        binData = null;
     }
 
-    public void write(OutputStream stream, HTTPResponse response) throws IOException {
-        stream.write("HTTP/1.1\r\n".getBytes());
+    public HTTPResponse(HTTPStatus status, byte[] binData, HashMap<String, String> header) {
+        this.status = status;
+        body = null;
+        this.header = header;
+        this.binData = binData;
+    }
 
-        if(response.header != null) {
+    public void write(OutputStream stream) throws IOException {
+        stream.write("HTTP/1.1\n".getBytes());
+
+        if(header != null) {
             for(Map.Entry<String, String> headerValue : header.entrySet()) {
-                stream.write((headerValue.getKey() + ": " + headerValue.getValue() + "\r\n").getBytes());
+                stream.write((headerValue.getKey() + ": " + headerValue.getValue() + "\n").getBytes());
             }
         }
 
-        stream.write("Server: VHTTP/0.1\r\n".getBytes());
+        stream.write("Server: VHTTP/0.1\n".getBytes());
 
-        if(response.body != null) {
-            stream.write(("Content-Length: " + (response.getBody().length() - 1) + "\r\n").getBytes());
-            stream.write("\r\n".getBytes());
-            stream.write(response.getBody().getBytes());
+        if(body != null) {
+            stream.write(("Content-Length: " + (body.length() - 1) + "\n").getBytes());
+            stream.write("\n".getBytes());
+            stream.write(body.getBytes());
+        } else if(binData != null) {
+            stream.write(("Content-Length: " + (binData.length - 1) + "\n").getBytes());
+            stream.write("\n".getBytes());
+            stream.write(binData);
         } else {
-            stream.write("\r\n".getBytes());
+            stream.write("\n".getBytes());
         }
 
         stream.flush();
@@ -50,5 +66,9 @@ public class HTTPResponse {
 
     public HashMap<String, String> getHeader() {
         return header;
+    }
+
+    public byte[] getBinData() {
+        return binData;
     }
 }

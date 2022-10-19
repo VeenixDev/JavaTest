@@ -30,7 +30,7 @@ public class Main {
                 HTTPParser parser = new HTTPParser(new ResponseFunction(), new ErrorResponseFunction());
                 HTTPResponse response = parser.parseFromSocket(socket);
                 try {
-                    response.write(socket.getOutputStream(), response);
+                    response.write(socket.getOutputStream());
 
                     parser.getReader().close();
                     socket.close();
