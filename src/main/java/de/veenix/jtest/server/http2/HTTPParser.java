@@ -31,13 +31,12 @@ public class HTTPParser {
             FunctionResponse<HTTPResponse> errorResponse = httpErrorResponseFunction.apply(request);
             if (errorResponse.isError()) {
                 log.error("Ran into an error while generating the error response");
-                return new HTTPResponse(HTTPStatus.INTERNAL_SERVER_ERROR, null, null);
+                return new HTTPResponse(HTTPStatus.INTERNAL_SERVER_ERROR, "<html><head><title>Internal Server Error</title></head><body>500 - Internal Server Error</body></html>", null);
             }
             log.warn("Generated error response without further errors");
             return errorResponse.getResponse();
         }
 
-        log.info("Generated response without errors");
         return response.getResponse();
     }
 
@@ -61,6 +60,7 @@ public class HTTPParser {
             log.error("Failed at parsing request: " + e.getMessage());
             throw new RuntimeException(e);
         }
+        log.info(firstLine);
         String[] args = firstLine.split(" ", Integer.MAX_VALUE);
         return new HTTPRequest(HTTPType.valueOf(args[0]), args[2], args[1], headers);
     }

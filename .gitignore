@@ -28,3 +28,4 @@ src/META-INF
 /.idea/
 .attach_pid*
 src/main/resources/META-INF
+logs/

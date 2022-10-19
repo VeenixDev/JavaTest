@@ -10,6 +10,6 @@ import java.util.function.Function;
 public class ErrorResponseFunction implements Function<HTTPRequest, FunctionResponse<HTTPResponse>> {
     @Override
     public FunctionResponse<HTTPResponse> apply(HTTPRequest httpRequest) {
-        return new FunctionResponse<>(false, new HTTPResponse(HTTPStatus.INTERNAL_SERVER_ERROR, null, null));
+        return new FunctionResponse<>(false, new HTTPResponse(HTTPStatus.INTERNAL_SERVER_ERROR, "<html><head><title>Ups...</title></head><body>Something unexpected happened we are sorry for the inconveniences</body></html>", null));
     }
 }
