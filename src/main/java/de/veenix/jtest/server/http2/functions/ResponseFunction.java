@@ -3,9 +3,6 @@ package de.veenix.jtest.server.http2.functions;
 import de.veenix.jtest.server.http2.*;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.FileDescriptor;
-import java.io.FileReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,8 +19,8 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
             copyKey("cookies", headers, httpRequest.getHeader());
             copyKey("session", headers, httpRequest.getHeader(), () -> UUID.randomUUID().toString());
         }
-        String[] requestedFileNameSplit = httpRequest.getRequestPath().split("/", Integer.MAX_VALUE);
-        FileInfo fileInfo = Utils.getFileInfo(requestedFileNameSplit[requestedFileNameSplit.length - 1]);
+
+        FileInfo fileInfo = Utils.getFileInfo(httpRequest.getRequestPath() + (httpRequest.getRequestPath().endsWith("/") ? "index.html" : ""));
         headers.put("Content-Type" , fileInfo.getMimeType());
 
         if(httpRequest.getType() == HTTPType.GET && httpRequest.getRequestPath().equals("/stopServer")) {
@@ -35,14 +32,6 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
 
         byte[] content = Utils.readFile(httpRequest.getRequestPath(), fileInfo.isBinary());
         if(content != null) {
-            if(httpRequest.getRequestPath().equals("/assets/logo.svg")) {
-                StringBuilder sb = new StringBuilder();
-                for(byte b : content) {
-                    sb.append((char) b);
-                }
-                log.info(sb.toString());
-            }
-
             return new FunctionResponse<>(false, new HTTPResponse(HTTPStatus.OK, Utils.readFile(httpRequest.getRequestPath(), fileInfo.isBinary()), headers));
         } else {
             log.warn("Couldn't find requested file");

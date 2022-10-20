@@ -60,7 +60,7 @@ public class HTTPParser {
             log.error("Failed at parsing request: " + e.getMessage());
             throw new RuntimeException(e);
         }
-        log.info(firstLine);
+        log.info("First line: " + firstLine);
         String[] args = firstLine.split(" ", Integer.MAX_VALUE);
         return new HTTPRequest(HTTPType.valueOf(args[0]), args[2], args[1], headers);
     }

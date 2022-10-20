@@ -6,16 +6,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 @Log4j2
 public class Utils {
 
-    private static final String BASE_PATH = "D:\\Workspace\\Private\\Web\\veenixdev.github.io";
+    private static final String BASE_PATH = "/home/paul/workspace/plainWeb";
 
     public static byte[] readFile(String relativePath, boolean isBinary) {
         if(relativePath.contains("..")) {
@@ -32,6 +30,20 @@ public class Utils {
 
         if(!file.exists()) {
             log.warn("File doesn't exit at path: " + file.getPath());
+            return null;
+        }
+
+        if(file.isDirectory()) {
+            if(!isBinary) {
+                byte[] indexBytes = readFile(relativePath + (relativePath.endsWith("/") ? "" : "/") + "index.html", false);
+                if(indexBytes != null) {
+                    return indexBytes;
+                } else {
+                    log.warn("Couldn't find a fallback file for the directory!");
+                    return null;
+                }
+            }
+            log.warn("Can't read directory: " + relativePath);
             return null;
         }
 
@@ -77,7 +89,10 @@ public class Utils {
         return Arrays.stream(binaryExtensions).anyMatch(ext -> ext.equals(extensionSplit[extensionSplit.length - 1]));
     }
 
-    public static FileInfo getFileInfo(String fileName) {
+    public static FileInfo getFileInfo(String path) {
+        String[] fileNameSplit = (BASE_PATH + path).split("/", Integer.MAX_VALUE);
+        String fileName = fileNameSplit[fileNameSplit.length - 1];
+
         String mimeType = getMimeType(fileName);
         boolean isBinary = isFileBinary(fileName);
         String[] extensionSplit = fileName.split("\\.", Integer.MAX_VALUE);
