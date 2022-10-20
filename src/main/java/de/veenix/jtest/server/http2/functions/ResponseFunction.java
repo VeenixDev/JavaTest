@@ -23,7 +23,7 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
         FileInfo fileInfo = Utils.getFileInfo(httpRequest.getRequestPath() + (httpRequest.getRequestPath().endsWith("/") ? "index.html" : ""));
         headers.put("Content-Type" , fileInfo.getMimeType());
 
-        if(httpRequest.getType() == HTTPType.GET && httpRequest.getRequestPath().equals("/stopServer")) {
+        if(Utils.checkMethodAndPath(httpRequest, HTTPType.GET, "/stopServer")) {
             // Killswitch for the server
             Main.setRunning(false);
             log.info("Server stops after the last request is handled");

@@ -71,15 +71,12 @@ public class Utils {
     }
 
     public static String getMimeType(String fileName) {
-        String[] extensionSplit = fileName.split("\\.", Integer.MAX_VALUE);
-        return switch(extensionSplit[extensionSplit.length - 1]) {
-            case "css" -> "text/css";
-            case "ico" -> "image/x-icon";
-            case "html", "htm" -> "text/html";
-            case "js" -> "text/javascript";
-            case "svg" -> "image/svg+xml";
-            default -> "text/plain";
-        };
+        try {
+            return Files.probeContentType(Path.of(fileName));
+        } catch (IOException exception) {
+            log.error("Failed at retrieving mime type: " + exception.getMessage());
+            return null;
+        }
     }
 
     private static final String[] binaryExtensions = {"ico", "bin", "exe", "jar"};
@@ -93,7 +90,7 @@ public class Utils {
         String[] fileNameSplit = (BASE_PATH + path).split("/", Integer.MAX_VALUE);
         String fileName = fileNameSplit[fileNameSplit.length - 1];
 
-        String mimeType = getMimeType(fileName);
+        String mimeType = getMimeType(path);
         boolean isBinary = isFileBinary(fileName);
         String[] extensionSplit = fileName.split("\\.", Integer.MAX_VALUE);
         String fileExtension = extensionSplit[extensionSplit.length - 1];
@@ -102,6 +99,14 @@ public class Utils {
     }
 
     public static boolean checkMethod(HTTPRequest request, HTTPType type) {
-        return false;
+        return request.getType() == type;
+    }
+
+    public static boolean checkRelativePath(HTTPRequest request, String relativePath) {
+        return request.getRequestPath().equals(relativePath);
+    }
+
+    public static boolean checkMethodAndPath(HTTPRequest request, HTTPType type, String relativePath) {
+        return checkMethod(request, type) && checkRelativePath(request, relativePath);
     }
 }
