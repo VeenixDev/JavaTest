@@ -15,10 +15,15 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
     public FunctionResponse<HTTPResponse> apply(HTTPRequest httpRequest) {
         log.info(httpRequest.toString());
         HashMap<String, String> headers = new HashMap<>();
+        Cookies cookies;
         if(httpRequest.getHeader() != null) {
-            copyKey("cookies", headers, httpRequest.getHeader());
-            copyKey("session", headers, httpRequest.getHeader(), () -> UUID.randomUUID().toString());
+            cookies = new Cookies(httpRequest.getHeader().get("Cookie"));
+        } else {
+            cookies = new Cookies(null);
         }
+
+        cookies.addIfNonExistent("session", () -> UUID.randomUUID().toString());
+        headers.put("Cookie", cookies.toString());
 
         FileInfo fileInfo = Utils.getFileInfo(httpRequest.getRequestPath() + (httpRequest.getRequestPath().endsWith("/") ? "index.html" : ""));
         headers.put("Content-Type" , fileInfo.getMimeType());
@@ -39,15 +44,17 @@ public class ResponseFunction implements Function<HTTPRequest, FunctionResponse<
         }
     }
 
-    private <K, V> void copyKey(final K key, Map<K, V> copyTo, Map<K, V> copyFrom, Supplier<V> supplier) {
+    private <K, V> V copyKey(final K key, Map<K, V> copyTo, Map<K, V> copyFrom, Supplier<V> supplier) {
         if(copyFrom.containsKey(key)) {
             copyTo.put(key, copyFrom.get(key));
         } else if(supplier != null) {
             copyTo.put(key, supplier.get());
         }
+
+        return copyTo.get(key);
     }
 
-    private <K, V> void copyKey(final K key, Map<K, V> copyTo, Map<K, V> copyFrom) {
-        copyKey(key, copyTo, copyFrom, null);
+    private <K, V> V copyKey(final K key, Map<K, V> copyTo, Map<K, V> copyFrom) {
+        return copyKey(key, copyTo, copyFrom, null);
     }
 }
