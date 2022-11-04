@@ -10,6 +10,7 @@ import java.util.Map;
  */
 public class HTTPResponse {
 
+    //TODO: Change header management to support "Set-Cookie" in response
     private final HTTPStatus status;
     private final String body;
     private final byte[] binData;
